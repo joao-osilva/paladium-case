@@ -24,6 +24,14 @@ interface Property {
   property_images?: { url: string; display_order: number }[]
 }
 
+interface PropertyForDelete {
+  id: string
+  title: string
+  city: string
+  country: string
+  imageUrl?: string
+}
+
 interface HostDashboardClientProps {
   userId: string
   initialProperties: Property[]
@@ -36,7 +44,7 @@ export function HostDashboardClient({ userId, initialProperties }: HostDashboard
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [propertyToEdit, setPropertyToEdit] = useState<Property | null>(null)
-  const [propertyToDelete, setPropertyToDelete] = useState<Property | null>(null)
+  const [propertyToDelete, setPropertyToDelete] = useState<PropertyForDelete | null>(null)
 
   const refreshProperties = async () => {
     setIsRefreshing(true)

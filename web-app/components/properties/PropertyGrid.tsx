@@ -18,7 +18,7 @@ interface Property {
   property_images?: { url: string; display_order: number }[]
   profiles?: {
     full_name: string
-    avatar_url?: string
+    avatar_url: string | null
   }
 }
 

@@ -26,6 +26,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       .from('bookings')
       .select(`
         id,
+        guest_id,
         check_in,
         check_out,
         guest_count,

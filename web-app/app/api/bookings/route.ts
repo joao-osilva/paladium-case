@@ -82,13 +82,13 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check for overlapping bookings using the database function
-    const { data: hasOverlap, error: overlapError } = await supabase
-      .rpc('check_booking_overlap', {
-        p_property_id: property_id,
-        p_check_in: check_in,
-        p_check_out: check_out
-      })
+    // Check for overlapping bookings directly
+    const { data: overlappingBookings, error: overlapError } = await supabase
+      .from('bookings')
+      .select('id')
+      .eq('property_id', property_id)
+      .eq('status', 'confirmed')
+      .or(`and(check_in.lt.${check_out},check_out.gt.${check_in})`)
 
     if (overlapError) {
       console.error('Error checking overlap:', overlapError)
@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    if (hasOverlap) {
+    if (overlappingBookings && overlappingBookings.length > 0) {
       return NextResponse.json(
         { error: 'Property is not available for the selected dates' },
         { status: 409 }

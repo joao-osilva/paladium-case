@@ -29,7 +29,7 @@ export default async function HostDashboard() {
   }
 
   // Try to fetch properties, but don't fail if tables don't exist yet
-  let properties = []
+  let properties: any[] = []
   try {
     const { data: propertiesData } = await supabase
       .from('properties')
