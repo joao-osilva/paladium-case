@@ -15,12 +15,9 @@ export default function RegisterPage() {
         <div className="flex justify-center">
           <Logo size="lg" />
         </div>
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          Join PaxBnb
-        </h2>
-        <p className="mt-2 text-center text-sm text-gray-600">
+        <p className="mt-6 text-center text-sm text-gray-600">
           Already have an account?{' '}
-          <Link href="/auth/login" className="font-medium text-blue-600 hover:text-blue-500">
+          <Link href="/auth/login" className="font-medium text-[#FF385C] hover:text-[#E31C5F] transition-colors">
             Sign in here
           </Link>
         </p>

@@ -1,77 +1,78 @@
 # PaxBnb Database Setup
 
-This directory contains all the database schema definitions and setup scripts for the PaxBnb application.
+## Quick Start
 
-## Files
+1. **Copy and paste `complete-schema.sql` into your Supabase SQL Editor**
+2. **Run it once** - this sets up everything you need
+3. **Done!** Your database is ready
 
-- `schema.sql` - Main database schema including tables, enums, and RLS policies
-- `functions.sql` - Custom database functions and triggers
-- `migrations/` - Directory for future migration scripts
+## What's Included
 
-## Setup Instructions
+The single `complete-schema.sql` file contains:
 
-### 1. Supabase Project Setup
+- **Tables**: profiles, properties, property_images, bookings
+- **Security**: Row Level Security policies for data protection
+- **Functions**: Automatic profile creation on user signup
+- **Storage**: File upload buckets for avatars and property images
+- **Indexes**: Performance optimizations for common queries
 
-1. Create a new Supabase project at [supabase.com](https://supabase.com)
-2. Navigate to the SQL Editor in your Supabase dashboard
-3. Run the SQL scripts in the following order:
+## Database Schema
 
-### 2. Database Schema Setup
-
-Execute the following files in order:
-
-1. **schema.sql** - Creates the main database structure
-   ```sql
-   -- Copy and paste the contents of schema.sql into Supabase SQL Editor
-   ```
-
-2. **functions.sql** - Creates custom functions and triggers
-   ```sql
-   -- Copy and paste the contents of functions.sql into Supabase SQL Editor
-   ```
-
-### 3. Environment Variables
-
-Ensure your `.env.local` file contains:
 ```
-NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+profiles (users extend auth.users)
+├── id, email, full_name, user_type (host/guest)
+├── phone, avatar_url, bio
+└── created_at, updated_at
+
+properties (host listings)
+├── host_id → profiles.id
+├── title, description
+├── price_per_night, bedrooms, beds, bathrooms (numeric), max_guests
+└── address, city, country
+
+property_images (property photos)
+├── property_id → properties.id
+├── url, display_order
+└── created_at
+
+bookings (guest reservations)
+├── property_id → properties.id
+├── guest_id → profiles.id  
+├── check_in, check_out, guest_count
+├── total_price, status (confirmed by default)
+├── created_at, updated_at
+└── date range exclusion constraint (prevents double-bookings)
 ```
 
-## Database Schema Overview
+## User Types
 
-### Tables
+- **Guest**: Can browse properties and make bookings
+- **Host**: Can list properties and manage bookings
 
-#### `profiles`
-- Extends Supabase's `auth.users` table
-- Stores user profile information and role (host/guest)
-- Has RLS policies for data security
-- Automatically created via trigger when user signs up
+## Security
 
-### Enums
+- Users can only see their own data
+- Host profiles are publicly visible (for property listings)
+- Published properties are publicly visible
+- Bookings are only visible to guest and property host
 
-#### `user_type_enum`
-- `host` - Users who can list properties
-- `guest` - Users who can make reservations
+## Troubleshooting
 
-### Security
+### Profile not created after signup
+```sql
+-- Check if user exists but profile missing
+SELECT au.id, au.email 
+FROM auth.users au 
+WHERE NOT EXISTS (SELECT 1 FROM profiles p WHERE p.id = au.id);
+```
 
-- Row Level Security (RLS) is enabled on all tables
-- Users can only access their own profile data
-- Automatic profile creation upon user registration
-- Email uniqueness is enforced
+### Check if everything is working
+```sql
+-- Verify setup
+SELECT 
+    (SELECT COUNT(*) FROM auth.users) as users,
+    (SELECT COUNT(*) FROM profiles) as profiles,
+    (SELECT COUNT(*) FROM properties) as properties;
+```
 
-## Key Features
-
-1. **Single Registration Per Email**: Each email can only register once with a specific role
-2. **Automatic Profile Creation**: Profiles are created automatically when users sign up
-3. **Role-Based Access**: Different access patterns for hosts and guests
-4. **Data Security**: RLS policies ensure users only access their own data
-
-## Future Enhancements
-
-This schema is designed to be extended with:
-- Properties table (for host listings)
-- Bookings table (for guest reservations)
-- Reviews and ratings system
-- Payment tracking
+That's it! Keep it simple. 🏠

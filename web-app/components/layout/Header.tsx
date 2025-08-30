@@ -22,7 +22,7 @@ export function Header({ showAuthButtons = true }: HeaderProps) {
               </Link>
               <Link 
                 href="/auth/register"
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                className="bg-[#FF385C] hover:bg-[#E31C5F] text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
               >
                 Sign Up
               </Link>

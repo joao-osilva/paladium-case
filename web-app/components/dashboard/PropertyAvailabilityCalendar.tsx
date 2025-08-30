@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { BookingTooltip } from '@/components/ui/BookingTooltip'
 import type { CalendarDay, CalendarMonth, BookingWithGuest } from '@/types/booking'
 
 interface PropertyAvailabilityCalendarProps {
@@ -170,43 +169,31 @@ export function PropertyAvailabilityCalendar({
 
         {/* Calendar Days */}
         <div className={`grid grid-cols-7 ${isMobile ? 'gap-0.5' : 'gap-1'}`}>
-          {calendarData.days.map((day, index) => {
-            const dayContent = (
-              <div
-                key={index}
-                className={`
-                  aspect-square flex items-center justify-center transition-colors relative
-                  ${!day.isCurrentMonth 
-                    ? 'text-gray-300 cursor-default' 
-                    : day.isToday
-                      ? 'bg-[#FF385C] text-white font-semibold cursor-default'
-                      : day.isAvailable
-                        ? 'text-[#222222] hover:bg-green-50 border border-green-200 cursor-default'
-                        : 'bg-red-100 text-red-800 hover:bg-red-150 cursor-pointer'
-                  }
-                  ${isMobile ? 'text-xs min-h-[30px] rounded-sm' : 'text-sm min-h-[48px] rounded-lg'}
-                `}
-              >
-                {day.date.getDate()}
-                
-                {/* Booking indicator dot */}
-                {day.booking && (
-                  <div className={`absolute bg-red-500 rounded-full ${isMobile ? 'top-0.5 right-0.5 w-1.5 h-1.5' : 'top-1 right-1 w-2 h-2'}`}></div>
-                )}
-              </div>
-            )
-
-            // Wrap with tooltip if there's a booking
-            if (day.booking && day.isCurrentMonth) {
-              return (
-                <BookingTooltip key={index} booking={day.booking}>
-                  {dayContent}
-                </BookingTooltip>
-              )
-            }
-
-            return dayContent
-          })}
+          {calendarData.days.map((day, index) => (
+            <div
+              key={index}
+              className={`
+                aspect-square flex items-center justify-center transition-colors relative
+                ${!day.isCurrentMonth 
+                  ? 'text-gray-300 cursor-default' 
+                  : day.isToday
+                    ? 'bg-[#FF385C] text-white font-semibold cursor-default'
+                    : day.isAvailable
+                      ? 'text-[#222222] hover:bg-green-50 border border-green-200 cursor-default'
+                      : 'bg-red-100 text-red-800 cursor-default'
+                }
+                ${isMobile ? 'text-xs min-h-[30px] rounded-sm' : 'text-sm min-h-[48px] rounded-lg'}
+              `}
+              title={day.booking ? 'Booked' : day.isAvailable ? 'Available' : ''}
+            >
+              {day.date.getDate()}
+              
+              {/* Booking indicator dot */}
+              {day.booking && (
+                <div className={`absolute bg-red-500 rounded-full ${isMobile ? 'top-0.5 right-0.5 w-1.5 h-1.5' : 'top-1 right-1 w-2 h-2'}`}></div>
+              )}
+            </div>
+          ))}
         </div>
 
         {/* Legend */}

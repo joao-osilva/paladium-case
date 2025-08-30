@@ -35,7 +35,7 @@ const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
                 value={option.value}
                 checked={value === option.value}
                 onChange={(e) => onChange(e.target.value)}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                className="h-4 w-4 text-[#FF385C] focus:ring-[#FF385C] focus:ring-opacity-50 border-gray-300"
               />
               <div className="ml-3">
                 <label

@@ -177,14 +177,14 @@ export function AvailabilityOverview({ userId, properties }: AvailabilityOvervie
             ) : selectedProperty ? (
               <>
                 {/* Property Info */}
-                <div className={`mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200 ${isMobile ? 'text-sm' : ''}`}>
+                <div className={`mb-4 p-4 bg-red-50 rounded-lg border border-red-200 ${isMobile ? 'text-sm' : ''}`}>
                   <h3 className={`font-semibold text-[#222222] ${isMobile ? 'text-base' : 'text-lg'}`}>
                     {selectedProperty.title}
                   </h3>
                   <p className={`text-[#717171] ${isMobile ? 'text-xs' : 'text-sm'}`}>
                     {selectedProperty.city}, {selectedProperty.country}
                   </p>
-                  <p className={`text-blue-700 mt-1 ${isMobile ? 'text-xs' : 'text-sm'}`}>
+                  <p className={`text-gray-600 mt-1 ${isMobile ? 'text-xs' : 'text-sm'}`}>
                     {bookings.length > 0 ? (
                       <>
                         {bookings.length} booking{bookings.length === 1 ? '' : 's'}

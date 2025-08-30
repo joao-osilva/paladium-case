@@ -152,9 +152,9 @@ export function PropertyCard({
         
         {/* Next Booking Info */}
         {showManagement && nextBooking && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
-            <p className="text-xs font-medium text-blue-800 mb-1">Next Check-in</p>
-            <p className="text-sm text-blue-700">
+          <div className="bg-[#FF385C] bg-opacity-5 border border-[#FF385C] border-opacity-20 rounded-lg p-3 mb-3">
+            <p className="text-xs font-medium text-[#FF385C] mb-1">Next Check-in</p>
+            <p className="text-sm text-gray-700">
               {new Date(nextBooking.checkIn).toLocaleDateString('en-US', { 
                 month: 'short', 
                 day: 'numeric' 

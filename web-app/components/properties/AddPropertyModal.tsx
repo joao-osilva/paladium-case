@@ -551,7 +551,7 @@ export function AddPropertyModal({ isOpen, onClose, onSuccess, userId }: AddProp
                 </svg>
                 <div className="ml-3">
                   <h3 className="text-sm font-medium text-blue-800">Tip</h3>
-                  <div className="mt-1 text-sm text-blue-700">
+                  <div className="mt-1 text-sm text-gray-600">
                     Consider your space carefully. Accurate details help guests find the perfect match for their needs.
                   </div>
                 </div>
