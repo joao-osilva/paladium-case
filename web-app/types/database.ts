@@ -45,6 +45,147 @@ export type Database = {
         }
         Relationships: []
       }
+      properties: {
+        Row: {
+          id: string
+          host_id: string
+          title: string
+          description: string
+          price_per_night: number
+          max_guests: number
+          bedrooms: number
+          beds: number
+          bathrooms: number
+          address: string
+          city: string
+          country: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          host_id: string
+          title: string
+          description: string
+          price_per_night: number
+          max_guests: number
+          bedrooms: number
+          beds: number
+          bathrooms: number
+          address: string
+          city: string
+          country: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          host_id?: string
+          title?: string
+          description?: string
+          price_per_night?: number
+          max_guests?: number
+          bedrooms?: number
+          beds?: number
+          bathrooms?: number
+          address?: string
+          city?: string
+          country?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "properties_host_id_fkey"
+            columns: ["host_id"]
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      property_images: {
+        Row: {
+          id: string
+          property_id: string
+          url: string
+          display_order: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          property_id: string
+          url: string
+          display_order?: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          property_id?: string
+          url?: string
+          display_order?: number
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_images_property_id_fkey"
+            columns: ["property_id"]
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      bookings: {
+        Row: {
+          id: string
+          property_id: string
+          guest_id: string
+          check_in: string
+          check_out: string
+          total_price: number
+          status: 'confirmed' | 'cancelled' | 'completed'
+          guest_count: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          property_id: string
+          guest_id: string
+          check_in: string
+          check_out: string
+          total_price: number
+          status?: 'confirmed' | 'cancelled' | 'completed'
+          guest_count: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          property_id?: string
+          guest_id?: string
+          check_in?: string
+          check_out?: string
+          total_price?: number
+          status?: 'confirmed' | 'cancelled' | 'completed'
+          guest_count?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_property_id_fkey"
+            columns: ["property_id"]
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_guest_id_fkey"
+            columns: ["guest_id"]
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -75,6 +216,7 @@ export type Database = {
     }
     Enums: {
       user_type_enum: 'host' | 'guest'
+      booking_status_enum: 'confirmed' | 'cancelled' | 'completed'
     }
     CompositeTypes: {
       [_ in never]: never

@@ -11,6 +11,16 @@
   --gray-light: #F7F7F7;
   --gray-medium: #717171;
   --gray-border: #DDDDDD;
+  
+  /* Status Colors */
+  --success: #10B981;
+  --success-light: #D1FAE5;
+  --warning: #F59E0B;
+  --warning-light: #FEF3C7;
+  --error: #EF4444;
+  --error-light: #FEE2E2;
+  --info: #3B82F6;
+  --info-light: #DBEAFE;
 }
 
 body {
@@ -21,15 +31,56 @@ body {
 
 @layer components {
   .btn-primary {
-    @apply bg-[#FF385C] text-white rounded-lg px-6 py-3 font-semibold hover:bg-[#E31C5F] transition-colors;
+    @apply inline-flex items-center justify-center bg-[#FF385C] text-white rounded-lg px-6 py-3 font-semibold hover:bg-[#E31C5F] transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98];
   }
   
   .btn-secondary {
-    @apply bg-white text-gray-700 border border-gray-300 rounded-lg px-6 py-3 font-semibold hover:bg-gray-50 transition-colors;
+    @apply inline-flex items-center justify-center bg-white text-gray-700 border border-gray-300 rounded-lg px-6 py-3 font-semibold hover:bg-gray-50 transition-all duration-200 hover:border-gray-400;
+  }
+  
+  .btn-ghost {
+    @apply inline-flex items-center justify-center text-gray-700 hover:bg-gray-100 rounded-lg px-4 py-2 font-medium transition-colors duration-200;
   }
   
   .card {
-    @apply bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow;
+    @apply bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300;
+  }
+  
+  .card-interactive {
+    @apply card cursor-pointer hover:shadow-xl hover:border-gray-300 transform hover:scale-[1.02] transition-all duration-300;
+  }
+  
+  .status-badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+  
+  .status-published {
+    @apply status-badge bg-green-100 text-green-800;
+  }
+  
+  .status-draft {
+    @apply status-badge bg-yellow-100 text-yellow-800;
+  }
+  
+  .status-inactive {
+    @apply status-badge bg-gray-100 text-gray-800;
+  }
+  
+  /* Loading States */
+  .skeleton {
+    @apply animate-pulse bg-gray-200 rounded;
+  }
+  
+  .skeleton-text {
+    @apply skeleton h-4;
+  }
+  
+  .skeleton-title {
+    @apply skeleton h-6;
+  }
+  
+  .skeleton-avatar {
+    @apply skeleton rounded-full;
   }
 }
 
