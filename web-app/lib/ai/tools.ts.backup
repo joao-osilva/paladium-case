@@ -1,0 +1,72 @@
+import { z } from 'zod';
+import { tool } from 'ai';
+
+// Search Properties Tool
+export const searchPropertiesSchema = z.object({
+  location: z.string().optional().describe('City, country, or area to search'),
+  checkin: z.string().optional().describe('Check-in date (YYYY-MM-DD)'),
+  checkout: z.string().optional().describe('Check-out date (YYYY-MM-DD)'),
+  guests: z.number().min(1).default(1).describe('Number of guests'),
+  minPrice: z.number().optional().describe('Minimum price per night'),
+  maxPrice: z.number().optional().describe('Maximum price per night'),
+  bedrooms: z.number().optional().describe('Minimum number of bedrooms'),
+});
+
+export const searchProperties = tool({
+  description: 'Search for available properties based on criteria',
+  parameters: searchPropertiesSchema,
+});
+
+// Get Property Details Tool
+export const getPropertyDetailsSchema = z.object({
+  propertyId: z.string().describe('The ID of the property to get details for'),
+});
+
+export const getPropertyDetails = tool({
+  description: 'Get detailed information about a specific property',
+  parameters: getPropertyDetailsSchema,
+});
+
+// Check Availability Tool
+export const checkAvailabilitySchema = z.object({
+  propertyId: z.string().describe('The ID of the property'),
+  checkin: z.string().describe('Check-in date (YYYY-MM-DD)'),
+  checkout: z.string().describe('Check-out date (YYYY-MM-DD)'),
+});
+
+export const checkAvailability = tool({
+  description: 'Check if a property is available for specific dates',
+  parameters: checkAvailabilitySchema,
+});
+
+// Create Booking Tool
+export const createBookingSchema = z.object({
+  propertyId: z.string().describe('The ID of the property to book'),
+  checkin: z.string().describe('Check-in date (YYYY-MM-DD)'),
+  checkout: z.string().describe('Check-out date (YYYY-MM-DD)'),
+  guestCount: z.number().min(1).describe('Number of guests'),
+});
+
+export const createBooking = tool({
+  description: 'Create a booking for a property (requires user to be logged in)',
+  parameters: createBookingSchema,
+});
+
+// Get User Bookings Tool
+export const getUserBookingsSchema = z.object({
+  status: z.enum(['all', 'upcoming', 'past', 'cancelled']).optional().default('all').describe('Filter bookings by status'),
+});
+
+export const getUserBookings = tool({
+  description: 'Get the current user\'s bookings',
+  parameters: getUserBookingsSchema,
+});
+
+// Export all tools as a collection
+export const aiTools = {
+  searchProperties,
+  getPropertyDetails,
+  checkAvailability,
+  createBooking,
+  getUserBookings,
+};

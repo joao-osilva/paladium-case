@@ -2,7 +2,8 @@ import { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import { PropertySearch } from '@/components/properties/PropertySearch'
 import { PropertyGrid } from '@/components/properties/PropertyGrid'
-import { Logo } from '@/components/layout/Logo'
+import { Header } from '@/components/layout/Header'
+import { FloatingAIButton } from '@/components/ai/FloatingAIButton'
 
 export const metadata: Metadata = {
   title: 'Browse Properties | PaxBnb',
@@ -25,6 +26,20 @@ interface PropertiesPageProps {
 
 export default async function PropertiesPage({ searchParams }: PropertiesPageProps) {
   const supabase = createClient()
+  
+  // Check authentication status
+  const { data: { user } } = await supabase.auth.getUser()
+  
+  // Get user profile if authenticated
+  let userProfile = null
+  if (user) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single()
+    userProfile = profile
+  }
   
   // Get all published properties with their images and host info
   let query = supabase
@@ -100,31 +115,7 @@ export default async function PropertiesPage({ searchParams }: PropertiesPagePro
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Logo size="md" href="/" />
-            </div>
-            
-            <div className="flex items-center space-x-4">
-              <a 
-                href="/auth/login" 
-                className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
-              >
-                Sign in
-              </a>
-              <a 
-                href="/auth/login" 
-                className="btn-primary text-sm px-4 py-2"
-              >
-                Sign up
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
+      <Header userProfile={userProfile} className="sticky top-0 z-40" />
 
       {/* Search Section */}
       <PropertySearch searchParams={searchParams} />
@@ -144,6 +135,9 @@ export default async function PropertiesPage({ searchParams }: PropertiesPagePro
         
         <PropertyGrid properties={properties || []} />
       </div>
+
+      {/* Floating AI Assistant Button */}
+      <FloatingAIButton suggestedPrompt="Help me find properties that match my criteria" />
     </div>
   )
 }

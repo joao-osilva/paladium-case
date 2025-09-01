@@ -99,7 +99,7 @@ export function PropertyDetailClient({ property, bookings, searchParams }: Prope
         </div>
 
         {/* Image Gallery */}
-        <div className="mb-8">
+        <div className="mb-12">
           <PropertyImageGallery 
             images={images} 
             propertyTitle={property.title}
