@@ -192,15 +192,7 @@ export function ChatInterface({ className = '' }: ChatInterfaceProps) {
                                     p: ({children}) => <p className="text-gray-700 my-1">{children}</p>,
                                     ul: ({children}) => <ul className="text-gray-700 my-1 ml-4 list-disc">{children}</ul>,
                                     li: ({children}) => <li className="text-gray-700">{children}</li>,
-                                    strong: ({children}) => <strong className="font-semibold text-gray-900">{children}</strong>,
-                                    img: ({src, alt}) => (
-                                      <img 
-                                        src={src} 
-                                        alt={alt} 
-                                        className="rounded-lg max-w-full h-auto mt-2 mb-1"
-                                        style={{ maxHeight: '200px', objectFit: 'cover' }}
-                                      />
-                                    )
+                                    strong: ({children}) => <strong className="font-semibold text-gray-900">{children}</strong>
                                   }}
                                 >
                                   {part.text}
@@ -431,8 +423,8 @@ export function ChatInterface({ className = '' }: ChatInterfaceProps) {
 
       {/* Input Area */}
       <div className="flex-shrink-0 border-t border-gray-200 bg-white p-3 safe-area-pb">
-        <form onSubmit={handleSubmit} className="flex gap-2">
-          <div className="flex-1 relative">
+        <form onSubmit={handleSubmit}>
+          <div className="relative">
             <textarea
               ref={inputRef}
               value={inputValue || ''}
@@ -440,7 +432,7 @@ export function ChatInterface({ className = '' }: ChatInterfaceProps) {
               onFocus={() => setIsExpanded(true)}
               onBlur={() => setTimeout(() => setIsExpanded(false), 100)}
               placeholder="Ask me anything about your stay..."
-              className="w-full resize-none rounded-xl border border-gray-300 pl-4 pr-14 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent max-h-32 min-h-[44px] text-base"
+              className="w-full resize-none rounded-xl border border-gray-300 pl-4 pr-12 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent max-h-32 min-h-[44px] text-base"
               rows={1}
               disabled={isLoading}
               onKeyDown={(e) => {
@@ -456,18 +448,6 @@ export function ChatInterface({ className = '' }: ChatInterfaceProps) {
               <VoiceInput onTranscript={handleVoiceInput} disabled={isLoading} />
             </div>
           </div>
-          
-          <button
-            type="submit"
-            disabled={!(inputValue || '').trim() || isLoading}
-            className="flex-shrink-0 w-11 h-11 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center touch-manipulation"
-          >
-            {isLoading ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
-            ) : (
-              <Send className="w-5 h-5" />
-            )}
-          </button>
         </form>
       </div>
     </div>

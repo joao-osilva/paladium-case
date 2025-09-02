@@ -59,6 +59,8 @@ IMPORTANT RESPONSE GUIDELINES:
 - After using getUserBookings tool, say something brief like "Here are your bookings:" or "Your upcoming trips:"
 - After using cancelBooking tool, let the visual confirmation show the cancellation details
 - NEVER provide detailed property listings in text - the visual components will show that
+- NEVER include images, pictures, or any markdown image syntax in your responses
+- NEVER describe property details like price, location, amenities in text - the UI components handle this
 - If dates are mentioned without a year, assume the current year
 - If a user wants to book but isn't logged in, politely ask them to sign in first
 
