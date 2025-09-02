@@ -40,6 +40,7 @@ CREATE TABLE properties (
     address TEXT NOT NULL,
     city TEXT NOT NULL,
     country TEXT NOT NULL,
+    location_type TEXT CHECK (location_type IN ('beach', 'countryside', 'city', 'mountain', 'lakeside', 'desert')),
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT timezone('utc'::text, now()),
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT timezone('utc'::text, now()),
     CONSTRAINT properties_pkey PRIMARY KEY (id),

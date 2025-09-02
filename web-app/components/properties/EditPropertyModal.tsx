@@ -16,7 +16,7 @@ interface Property {
   address: string
   city: string
   country: string
-  property_images?: { url: string; display_order: number }[]
+  property_images?: { url: string; display_order: number | null }[]
 }
 
 interface EditPropertyModalProps {
@@ -45,7 +45,7 @@ export function EditPropertyModal({ isOpen, onClose, onSuccess, property }: Edit
   const [step, setStep] = useState(1)
   const [images, setImages] = useState<File[]>([])
   const [previewUrls, setPreviewUrls] = useState<string[]>([])
-  const [existingImages, setExistingImages] = useState<{ url: string; display_order: number }[]>([])
+  const [existingImages, setExistingImages] = useState<{ url: string; display_order: number | null }[]>([])
   const [imagesToDelete, setImagesToDelete] = useState<string[]>([])
   const [errors, setErrors] = useState<ValidationErrors>({})
   const [touched, setTouched] = useState<Record<string, boolean>>({})
@@ -350,7 +350,7 @@ export function EditPropertyModal({ isOpen, onClose, onSuccess, property }: Edit
 
       // Handle new image uploads
       if (images.length > 0) {
-        const currentMaxOrder = Math.max(...existingImages.map(img => img.display_order), -1)
+        const currentMaxOrder = Math.max(...existingImages.map(img => img.display_order || 0), -1)
         
         const imagePromises = images.map(async (image, index) => {
           const fileExt = image.name.split('.').pop()

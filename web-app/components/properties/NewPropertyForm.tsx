@@ -24,8 +24,18 @@ export function NewPropertyForm({ userId }: NewPropertyFormProps) {
     bathrooms: '1',
     address: '',
     city: '',
-    country: ''
+    country: '',
+    location_type: 'city' // Default to city
   })
+
+  const locationTypes = [
+    { value: 'beach', label: '🏖️ Beach/Coastal', description: 'Near ocean, sea, or beach' },
+    { value: 'countryside', label: '🌾 Countryside/Rural', description: 'Rural areas, farms, quiet landscapes' },
+    { value: 'city', label: '🏙️ City/Urban', description: 'City center, downtown, urban areas' },
+    { value: 'mountain', label: '🏔️ Mountain', description: 'Mountain areas, ski resorts, hills' },
+    { value: 'lakeside', label: '🏞️ Lakeside', description: 'Near lakes, rivers, waterfront' },
+    { value: 'desert', label: '🏜️ Desert', description: 'Desert areas, arid landscapes' }
+  ]
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
@@ -60,7 +70,8 @@ export function NewPropertyForm({ userId }: NewPropertyFormProps) {
           bathrooms: parseFloat(formData.bathrooms),
           address: formData.address,
           city: formData.city,
-          country: formData.country
+          country: formData.country,
+          location_type: formData.location_type
         })
         .select()
         .single()
@@ -229,6 +240,27 @@ export function NewPropertyForm({ userId }: NewPropertyFormProps) {
           <h2 className="text-xl font-semibold text-[#222222] mb-6">Location</h2>
           
           <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-[#222222] mb-2">
+                Location Type
+              </label>
+              <select
+                required
+                value={formData.location_type}
+                onChange={(e) => setFormData({...formData, location_type: e.target.value})}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent"
+              >
+                {locationTypes.map((type) => (
+                  <option key={type.value} value={type.value}>
+                    {type.label}
+                  </option>
+                ))}
+              </select>
+              <p className="text-xs text-[#717171] mt-1">
+                {locationTypes.find(t => t.value === formData.location_type)?.description}
+              </p>
+            </div>
+
             <div>
               <label className="block text-sm font-medium text-[#222222] mb-2">
                 Address

@@ -15,7 +15,8 @@ interface Property {
   address: string
   city: string
   country: string
-  property_images?: { url: string; display_order: number }[]
+  location_type?: string | null
+  property_images?: { url: string; display_order: number | null }[]
   profiles?: {
     full_name: string
     avatar_url: string | null
@@ -95,6 +96,24 @@ function GuestPropertyCard({ property }: GuestPropertyCardProps) {
     window.location.href = `/properties/${property.id}`
   }
 
+  const getLocationTypeBadge = (locationType?: string | null) => {
+    if (!locationType) return null
+    
+    const badges = {
+      beach: { emoji: '🏖️', label: 'Beach', bg: 'bg-blue-100', text: 'text-blue-800' },
+      countryside: { emoji: '🌾', label: 'Countryside', bg: 'bg-green-100', text: 'text-green-800' },
+      city: { emoji: '🏙️', label: 'City', bg: 'bg-gray-100', text: 'text-gray-800' },
+      mountain: { emoji: '🏔️', label: 'Mountain', bg: 'bg-purple-100', text: 'text-purple-800' },
+      lakeside: { emoji: '🏞️', label: 'Lakeside', bg: 'bg-teal-100', text: 'text-teal-800' },
+      desert: { emoji: '🏜️', label: 'Desert', bg: 'bg-orange-100', text: 'text-orange-800' }
+    }
+    
+    const badge = badges[locationType as keyof typeof badges]
+    return badge || null
+  }
+
+  const locationBadge = getLocationTypeBadge(property.location_type)
+
 
   return (
     <div 
@@ -143,7 +162,15 @@ function GuestPropertyCard({ property }: GuestPropertyCardProps) {
         <div className="flex justify-between items-start mb-2">
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-[#222222] line-clamp-1 mb-1">{property.title}</h3>
-            <p className="text-sm text-[#717171]">{property.city}, {property.country}</p>
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-[#717171]">{property.city}, {property.country}</p>
+              {locationBadge && (
+                <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${locationBadge.bg} ${locationBadge.text}`}>
+                  <span>{locationBadge.emoji}</span>
+                  {locationBadge.label}
+                </span>
+              )}
+            </div>
           </div>
         </div>
         

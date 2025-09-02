@@ -39,7 +39,7 @@ export default async function PropertyDetailPage({ params, searchParams }: Prope
   const supabase = createClient()
   
   // Get property details with host info
-  const { data: property, error } = await supabase
+  const { data: propertyData, error } = await supabase
     .from('properties')
     .select(`
       id,
@@ -53,6 +53,7 @@ export default async function PropertyDetailPage({ params, searchParams }: Prope
       address,
       city,
       country,
+      location_type,
       created_at,
       property_images (
         url,
@@ -68,9 +69,11 @@ export default async function PropertyDetailPage({ params, searchParams }: Prope
     .eq('id', params.id)
     .single()
 
-  if (error || !property) {
+  if (error || !propertyData) {
     notFound()
   }
+
+  const property = propertyData
 
   // Get existing bookings for this property to show availability
   const { data: bookings } = await supabase
@@ -81,7 +84,7 @@ export default async function PropertyDetailPage({ params, searchParams }: Prope
 
   return (
     <PropertyDetailClient 
-      property={property} 
+      property={property as any} 
       bookings={bookings || []}
       searchParams={searchParams}
     />
