@@ -22,6 +22,7 @@ interface ValidationErrors {
   address?: string
   city?: string
   country?: string
+  location_type?: string
   images?: string
 }
 
@@ -46,8 +47,18 @@ export function AddPropertyModal({ isOpen, onClose, onSuccess, userId }: AddProp
     bathrooms: '1',
     address: '',
     city: '',
-    country: ''
+    country: '',
+    location_type: 'city'
   })
+
+  const locationTypes = [
+    { value: 'beach', label: '🏖️ Beach', emoji: '🏖️' },
+    { value: 'countryside', label: '🌾 Countryside', emoji: '🌾' },
+    { value: 'city', label: '🏙️ City', emoji: '🏙️' },
+    { value: 'mountain', label: '⛰️ Mountain', emoji: '⛰️' },
+    { value: 'lakeside', label: '🏞️ Lakeside', emoji: '🏞️' },
+    { value: 'desert', label: '🏜️ Desert', emoji: '🏜️' }
+  ]
 
   useEffect(() => {
     const checkMobile = () => {
@@ -120,6 +131,12 @@ export function AddPropertyModal({ isOpen, onClose, onSuccess, userId }: AddProp
         if (!value.trim()) return 'Country is required'
         if (value.trim().length < 2) return 'Country name must be at least 2 characters'
         break
+      
+      case 'location_type':
+        if (!value) return 'Location type is required'
+        const validTypes = ['beach', 'countryside', 'city', 'mountain', 'lakeside', 'desert']
+        if (!validTypes.includes(value)) return 'Invalid location type'
+        break
     }
     return undefined
   }
@@ -137,6 +154,7 @@ export function AddPropertyModal({ isOpen, onClose, onSuccess, userId }: AddProp
       newErrors.beds = validateField('beds', formData.beds)
       newErrors.bathrooms = validateField('bathrooms', formData.bathrooms)
     } else if (stepNumber === 3) {
+      newErrors.location_type = validateField('location_type', formData.location_type)
       newErrors.address = validateField('address', formData.address)
       newErrors.city = validateField('city', formData.city)
       newErrors.country = validateField('country', formData.country)
@@ -176,7 +194,8 @@ export function AddPropertyModal({ isOpen, onClose, onSuccess, userId }: AddProp
       bathrooms: '1',
       address: '',
       city: '',
-      country: ''
+      country: '',
+      location_type: 'city'
     })
     setImages([])
     setPreviewUrls([])
@@ -267,7 +286,8 @@ export function AddPropertyModal({ isOpen, onClose, onSuccess, userId }: AddProp
           bathrooms: parseFloat(formData.bathrooms),
           address: formData.address.trim(),
           city: formData.city.trim(),
-          country: formData.country.trim()
+          country: formData.country.trim(),
+          location_type: formData.location_type
         })
         .select()
         .single()
@@ -580,6 +600,32 @@ export function AddPropertyModal({ isOpen, onClose, onSuccess, userId }: AddProp
         {step === 3 && (
           <div className={`space-y-6 ${isMobile ? 'p-4' : 'p-6'}`}>
             <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-[#222222] mb-2">
+                  Location Type *
+                </label>
+                <select
+                  value={formData.location_type}
+                  onChange={(e) => handleFieldChange('location_type', e.target.value)}
+                  onBlur={() => handleFieldBlur('location_type')}
+                  className={`
+                    w-full border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent transition-colors
+                    ${isMobile ? 'px-4 py-4 text-base' : 'px-4 py-3'}
+                    ${errors.location_type ? 'border-red-500' : 'border-gray-300'}
+                  `}
+                >
+                  {locationTypes.map((type) => (
+                    <option key={type.value} value={type.value}>
+                      {type.label}
+                    </option>
+                  ))}
+                </select>
+                {errors.location_type && <p className="text-red-500 text-sm mt-1">{errors.location_type}</p>}
+                <p className="text-gray-500 text-xs mt-1">
+                  Choose the environment that best describes your property
+                </p>
+              </div>
+
               <div>
                 <label className="block text-sm font-medium text-[#222222] mb-2">
                   Street Address *

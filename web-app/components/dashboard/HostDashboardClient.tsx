@@ -21,6 +21,7 @@ interface Property {
   address: string
   city: string
   country: string
+  location_type: string | null
   property_images?: { url: string; display_order: number | null }[]
 }
 
@@ -50,28 +51,70 @@ export function HostDashboardClient({ userId, initialProperties }: HostDashboard
     setIsRefreshing(true)
     try {
       const supabase = createClient()
-      const { data: propertiesData } = await supabase
-        .from('properties')
-        .select(`
-          id,
-          title,
-          description,
-          price_per_night,
-          bedrooms,
-          beds,
-          bathrooms,
-          max_guests,
-          address,
-          city,
-          country,
-          created_at,
-          property_images (
-            url,
-            display_order
-          )
-        `)
-        .eq('host_id', userId)
-        .order('created_at', { ascending: false })
+      
+      // Try with location_type first, fallback to without it if column doesn't exist
+      let propertiesData: Property[] = []
+      try {
+        const { data, error } = await supabase
+          .from('properties')
+          .select(`
+            id,
+            title,
+            description,
+            price_per_night,
+            bedrooms,
+            beds,
+            bathrooms,
+            max_guests,
+            address,
+            city,
+            country,
+            location_type,
+            created_at,
+            property_images (
+              url,
+              display_order
+            )
+          `)
+          .eq('host_id', userId)
+          .order('created_at', { ascending: false })
+        
+        if (error) throw error
+        propertiesData = (data as unknown as Property[]) || []
+      } catch (locationTypeError) {
+        // Fallback to query without location_type if column doesn't exist
+        console.log('location_type column not found, using fallback query')
+        const { data, error } = await supabase
+          .from('properties')
+          .select(`
+            id,
+            title,
+            description,
+            price_per_night,
+            bedrooms,
+            beds,
+            bathrooms,
+            max_guests,
+            address,
+            city,
+            country,
+            created_at,
+            property_images (
+              url,
+              display_order
+            )
+          `)
+          .eq('host_id', userId)
+          .order('created_at', { ascending: false })
+        
+        if (error) throw error
+        
+        // Add default location_type for existing properties
+        propertiesData = (data || []).map(property => ({
+          ...property,
+          location_type: 'city' as const
+        })) as Property[]
+      }
       
       setProperties(propertiesData || [])
     } catch (error) {

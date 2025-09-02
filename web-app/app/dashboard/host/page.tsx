@@ -31,17 +31,65 @@ export default async function HostDashboard() {
   // Try to fetch properties, but don't fail if tables don't exist yet
   let properties: any[] = []
   try {
-    const { data: propertiesData } = await supabase
-      .from('properties')
-      .select(`
-        *,
-        property_images (
-          url,
-          display_order
-        )
-      `)
-      .eq('host_id', user.id)
-      .order('created_at', { ascending: false })
+    // Try with location_type first, fallback to without it if column doesn't exist
+    let propertiesData;
+    try {
+      const { data } = await supabase
+        .from('properties')
+        .select(`
+          id,
+          title,
+          description,
+          price_per_night,
+          bedrooms,
+          beds,
+          bathrooms,
+          max_guests,
+          address,
+          city,
+          country,
+          location_type,
+          created_at,
+          property_images (
+            url,
+            display_order
+          )
+        `)
+        .eq('host_id', user.id)
+        .order('created_at', { ascending: false })
+      propertiesData = data
+    } catch (locationTypeError) {
+      // Fallback to query without location_type if column doesn't exist
+      console.log('location_type column not found, using fallback query')
+      const { data } = await supabase
+        .from('properties')
+        .select(`
+          id,
+          title,
+          description,
+          price_per_night,
+          bedrooms,
+          beds,
+          bathrooms,
+          max_guests,
+          address,
+          city,
+          country,
+          created_at,
+          property_images (
+            url,
+            display_order
+          )
+        `)
+        .eq('host_id', user.id)
+        .order('created_at', { ascending: false })
+      
+      // Add default location_type for existing properties
+      propertiesData = data?.map(property => ({
+        ...property,
+        location_type: 'city'
+      }))
+    }
     
     properties = propertiesData || []
   } catch (error) {
