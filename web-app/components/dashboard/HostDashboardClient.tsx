@@ -1,9 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { PropertyCard } from '@/components/properties/PropertyCard'
-import { AddPropertyModal } from '@/components/properties/AddPropertyModal'
+import { AddPropertyAIModal } from '@/components/properties/AddPropertyAIModal'
 import { EditPropertyModal } from '@/components/properties/EditPropertyModal'
 import { DeletePropertyModal } from '@/components/properties/DeletePropertyModal'
 import { AvailabilityOverview } from './AvailabilityOverview'
@@ -40,12 +40,13 @@ interface HostDashboardClientProps {
 
 export function HostDashboardClient({ userId, initialProperties }: HostDashboardClientProps) {
   const [properties, setProperties] = useState<Property[]>(initialProperties)
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false)
+  const [isAddAIModalOpen, setIsAddAIModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [propertyToEdit, setPropertyToEdit] = useState<Property | null>(null)
   const [propertyToDelete, setPropertyToDelete] = useState<PropertyForDelete | null>(null)
+
 
   const refreshProperties = async () => {
     setIsRefreshing(true)
@@ -178,8 +179,8 @@ export function HostDashboardClient({ userId, initialProperties }: HostDashboard
             <p className="text-[#717171]">Manage your properties and bookings</p>
           </div>
           <button 
-            onClick={() => setIsAddModalOpen(true)}
-            className="mt-4 sm:mt-0 btn-primary"
+            onClick={() => setIsAddAIModalOpen(true)}
+            className="mt-4 sm:mt-0 btn-primary flex items-center"
           >
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
@@ -277,7 +278,7 @@ export function HostDashboardClient({ userId, initialProperties }: HostDashboard
                 Create your first property listing and begin your hosting journey with PaxBnb
               </p>
               <button 
-                onClick={() => setIsAddModalOpen(true)}
+                onClick={() => setIsAddAIModalOpen(true)}
                 className="btn-primary"
               >
                 <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -305,10 +306,10 @@ export function HostDashboardClient({ userId, initialProperties }: HostDashboard
         )}
       </div>
 
-      {/* Add Property Modal */}
-      <AddPropertyModal
-        isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
+      {/* Add Property AI Modal */}
+      <AddPropertyAIModal
+        isOpen={isAddAIModalOpen}
+        onClose={() => setIsAddAIModalOpen(false)}
         onSuccess={handlePropertyAdded}
         userId={userId}
       />
