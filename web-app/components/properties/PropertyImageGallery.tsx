@@ -4,7 +4,7 @@ import { useState } from 'react'
 
 interface PropertyImage {
   url: string
-  display_order: number
+  display_order: number | null
 }
 
 interface PropertyImageGalleryProps {

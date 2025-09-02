@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useChat } from '@ai-sdk/react';
 import { DefaultChatTransport } from 'ai';
 import ReactMarkdown from 'react-markdown';
+import { Send, Loader2, MessageCircle, User } from 'lucide-react';
 import { GREETING_SUGGESTIONS } from '@/lib/ai/prompts';
 import { SearchResults } from './GenerativeUI/SearchResults';
 import { BookingsList } from './GenerativeUI/BookingsList';
@@ -82,8 +83,20 @@ export function ChatInterface({ className = '' }: ChatInterfaceProps) {
     setTimeout(() => inputRef.current?.focus(), 100);
   };
 
-  const handleVoiceInput = (transcript: string) => {
-    setInputValue(transcript || '');
+  const handleVoiceInput = async (transcript: string) => {
+    if (!transcript || !transcript.trim() || isLoading) return;
+    
+    // Directly send the transcribed message
+    setIsLoading(true);
+    try {
+      sendMessage({ text: transcript.trim() });
+      setInputValue('');
+      setIsExpanded(false);
+    } catch (error) {
+      console.error('Error sending voice message:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const isEmpty = messages.length === 0;
@@ -94,14 +107,12 @@ export function ChatInterface({ className = '' }: ChatInterfaceProps) {
       <div className="flex-shrink-0 px-4 py-3 border-b border-gray-200 bg-white">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-            </svg>
+            <MessageCircle className="w-4 h-4 text-white" />
           </div>
           <div>
-            <h3 className="font-medium text-gray-900">PaxBnb AI Assistant</h3>
+            <h3 className="font-medium text-gray-900">PaxBnb AI</h3>
             <p className="text-xs text-gray-500">
-              {isLoading ? 'Thinking...' : 'Ask me to find properties or help with bookings'}
+              {isLoading ? 'Thinking...' : 'Find your perfect stay'}
             </p>
           </div>
         </div>
@@ -112,16 +123,13 @@ export function ChatInterface({ className = '' }: ChatInterfaceProps) {
         {isEmpty && (
           <div className="text-center py-8">
             <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-              </svg>
+              <MessageCircle className="w-8 h-8 text-blue-600" />
             </div>
             <h3 className="text-lg font-medium text-gray-900 mb-2">
-              Hi! I'm your PaxBnb travel assistant
+              Find your perfect stay
             </h3>
-            <p className="text-gray-600 mb-6 max-w-md mx-auto">
-              I can help you find amazing properties, check availability, and make bookings. 
-              Try one of these suggestions or ask me anything!
+            <p className="text-gray-600 mb-4 max-w-md mx-auto">
+              Search properties, check availability, or ask me anything!
             </p>
             
             {/* Suggestions */}
@@ -151,13 +159,9 @@ export function ChatInterface({ className = '' }: ChatInterfaceProps) {
                       : 'bg-blue-600'
                   }`}>
                     {message.role === 'user' ? (
-                      <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                      </svg>
+                      <User className="w-4 h-4 text-gray-600" />
                     ) : (
-                      <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                      </svg>
+                      <MessageCircle className="w-4 h-4 text-white" />
                     )}
                   </div>
                 </div>
@@ -396,9 +400,7 @@ export function ChatInterface({ className = '' }: ChatInterfaceProps) {
           <div className="flex gap-3">
             <div className="flex-shrink-0">
               <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center">
-                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                </svg>
+                <MessageCircle className="w-4 h-4 text-white" />
               </div>
             </div>
             <div className="flex-1">
@@ -428,8 +430,8 @@ export function ChatInterface({ className = '' }: ChatInterfaceProps) {
       </div>
 
       {/* Input Area */}
-      <div className="flex-shrink-0 border-t border-gray-200 bg-white p-4">
-        <form onSubmit={handleSubmit} className="flex gap-3">
+      <div className="flex-shrink-0 border-t border-gray-200 bg-white p-3 safe-area-pb">
+        <form onSubmit={handleSubmit} className="flex gap-2">
           <div className="flex-1 relative">
             <textarea
               ref={inputRef}
@@ -437,8 +439,8 @@ export function ChatInterface({ className = '' }: ChatInterfaceProps) {
               onChange={handleInputChange}
               onFocus={() => setIsExpanded(true)}
               onBlur={() => setTimeout(() => setIsExpanded(false), 100)}
-              placeholder="Ask me to find properties, check availability, or help with bookings..."
-              className="w-full resize-none rounded-lg border border-gray-300 px-4 py-3 pr-12 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent max-h-32 min-h-[48px]"
+              placeholder="Ask me anything about your stay..."
+              className="w-full resize-none rounded-xl border border-gray-300 pl-4 pr-14 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent max-h-32 min-h-[44px] text-base"
               rows={1}
               disabled={isLoading}
               onKeyDown={(e) => {
@@ -449,8 +451,8 @@ export function ChatInterface({ className = '' }: ChatInterfaceProps) {
               }}
             />
             
-            {/* Voice input button */}
-            <div className="absolute right-2 top-2">
+            {/* Voice input button - positioned for right thumb access */}
+            <div className="absolute right-3 top-1/2 -translate-y-1/2">
               <VoiceInput onTranscript={handleVoiceInput} disabled={isLoading} />
             </div>
           </div>
@@ -458,16 +460,12 @@ export function ChatInterface({ className = '' }: ChatInterfaceProps) {
           <button
             type="submit"
             disabled={!(inputValue || '').trim() || isLoading}
-            className="flex-shrink-0 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="flex-shrink-0 w-11 h-11 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center touch-manipulation"
           >
             {isLoading ? (
-              <svg className="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
+              <Loader2 className="w-5 h-5 animate-spin" />
             ) : (
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-              </svg>
+              <Send className="w-5 h-5" />
             )}
           </button>
         </form>

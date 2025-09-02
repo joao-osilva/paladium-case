@@ -15,6 +15,7 @@ interface PropertyCardProps {
     max_guests: number;
     city: string;
     country: string;
+    location_type?: string;
     property_images?: Array<{ url: string; display_order?: number }>;
     profiles?: { full_name: string; avatar_url?: string };
   };
@@ -24,6 +25,24 @@ interface PropertyCardProps {
 export function PropertyCard({ property, onCheckAvailability }: PropertyCardProps) {
   const [imageError, setImageError] = useState(false);
   const mainImage = property.property_images?.[0]?.url;
+
+  const getLocationTypeBadge = (locationType?: string) => {
+    if (!locationType) return null;
+    
+    const badges = {
+      beach: { emoji: '🏖️', label: 'Beach', bg: 'bg-blue-100', text: 'text-blue-800' },
+      countryside: { emoji: '🌾', label: 'Countryside', bg: 'bg-green-100', text: 'text-green-800' },
+      city: { emoji: '🏙️', label: 'City', bg: 'bg-gray-100', text: 'text-gray-800' },
+      mountain: { emoji: '🏔️', label: 'Mountain', bg: 'bg-purple-100', text: 'text-purple-800' },
+      lakeside: { emoji: '🏞️', label: 'Lakeside', bg: 'bg-teal-100', text: 'text-teal-800' },
+      desert: { emoji: '🏜️', label: 'Desert', bg: 'bg-orange-100', text: 'text-orange-800' }
+    };
+    
+    const badge = badges[locationType as keyof typeof badges];
+    return badge || null;
+  };
+
+  const locationBadge = getLocationTypeBadge(property.location_type);
 
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
@@ -57,9 +76,17 @@ export function PropertyCard({ property, onCheckAvailability }: PropertyCardProp
           {property.title}
         </h3>
         
-        <p className="text-gray-600 text-sm mb-2">
-          {property.city}, {property.country}
-        </p>
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-gray-600 text-sm">
+            {property.city}, {property.country}
+          </p>
+          {locationBadge && (
+            <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${locationBadge.bg} ${locationBadge.text}`}>
+              <span>{locationBadge.emoji}</span>
+              {locationBadge.label}
+            </span>
+          )}
+        </div>
 
         <div className="flex items-center gap-3 text-sm text-gray-600 mb-3">
           <span className="flex items-center gap-1">

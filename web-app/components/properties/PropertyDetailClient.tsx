@@ -7,7 +7,7 @@ import { BookingWidget } from '../booking/BookingWidget'
 
 interface PropertyImage {
   url: string
-  display_order: number
+  display_order: number | null
 }
 
 interface Host {
@@ -29,6 +29,7 @@ interface Property {
   address: string
   city: string
   country: string
+  location_type?: string | null
   created_at: string
   property_images?: PropertyImage[]
   profiles?: Host
@@ -65,8 +66,26 @@ export function PropertyDetailClient({ property, bookings, searchParams }: Prope
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
-  const images = property.property_images?.sort((a, b) => a.display_order - b.display_order) || []
+  const images = property.property_images?.sort((a, b) => (a.display_order || 0) - (b.display_order || 0)) || []
   const hostJoinedYear = new Date(property.profiles?.created_at || property.created_at).getFullYear()
+
+  const getLocationTypeBadge = (locationType?: string | null) => {
+    if (!locationType) return null
+    
+    const badges = {
+      beach: { emoji: '🏖️', label: 'Beach', bg: 'bg-blue-100', text: 'text-blue-800' },
+      countryside: { emoji: '🌾', label: 'Countryside', bg: 'bg-green-100', text: 'text-green-800' },
+      city: { emoji: '🏙️', label: 'City', bg: 'bg-gray-100', text: 'text-gray-800' },
+      mountain: { emoji: '🏔️', label: 'Mountain', bg: 'bg-purple-100', text: 'text-purple-800' },
+      lakeside: { emoji: '🏞️', label: 'Lakeside', bg: 'bg-teal-100', text: 'text-teal-800' },
+      desert: { emoji: '🏜️', label: 'Desert', bg: 'bg-orange-100', text: 'text-orange-800' }
+    }
+    
+    const badge = badges[locationType as keyof typeof badges]
+    return badge || null
+  }
+
+  const locationBadge = getLocationTypeBadge(property.location_type)
 
 
   return (
@@ -93,8 +112,16 @@ export function PropertyDetailClient({ property, bookings, searchParams }: Prope
         {/* Property Title */}
         <div className="py-6">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">{property.title}</h1>
-          <div className="flex items-center space-x-2 text-sm text-gray-600">
-            <span>{property.city}, {property.country}</span>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2 text-sm text-gray-600">
+              <span>{property.city}, {property.country}</span>
+            </div>
+            {locationBadge && (
+              <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${locationBadge.bg} ${locationBadge.text}`}>
+                <span>{locationBadge.emoji}</span>
+                {locationBadge.label}
+              </span>
+            )}
           </div>
         </div>
 

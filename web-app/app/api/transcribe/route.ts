@@ -34,19 +34,21 @@ export async function POST(request: NextRequest) {
 
     console.log('Processing transcription with Deepgram...', { fileType: audioFile.type });
 
-    // Simplified transcription options - let Deepgram auto-detect format
+    // Simplified transcription options - let Deepgram auto-detect format and language
     const transcriptionOptions = {
       model: 'nova-2',
-      language: 'en-US',
+      detect_language: true,  // Auto-detect language
       smart_format: true,
       punctuate: true,
       diarize: false,
       utterances: false,
     };
 
-    // Try using the file directly (Node.js Readable stream approach)
+    // Convert File to Buffer for Deepgram
+    const audioBuffer = Buffer.from(await audioFile.arrayBuffer());
+    
     const { result, error } = await deepgram.listen.prerecorded.transcribeFile(
-      audioFile.stream(),
+      audioBuffer,
       transcriptionOptions
     );
 

@@ -18,6 +18,7 @@ interface SearchParams {
   min_price?: string
   max_price?: string
   bedrooms?: string
+  location_type?: string
 }
 
 interface PropertiesPageProps {
@@ -56,6 +57,7 @@ export default async function PropertiesPage({ searchParams }: PropertiesPagePro
       address,
       city,
       country,
+      location_type,
       created_at,
       property_images (
         url,
@@ -85,6 +87,10 @@ export default async function PropertiesPage({ searchParams }: PropertiesPagePro
     if (!isNaN(bedroomCount)) {
       query = query.gte('bedrooms', bedroomCount)
     }
+  }
+
+  if (searchParams.location_type) {
+    query = query.eq('location_type', searchParams.location_type)
   }
 
   if (searchParams.min_price || searchParams.max_price) {

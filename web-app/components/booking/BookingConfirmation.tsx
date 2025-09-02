@@ -9,7 +9,7 @@ interface Property {
   address: string
   city: string
   country: string
-  property_images?: { url: string; display_order: number }[]
+  property_images?: { url: string; display_order: number | null }[]
   profiles?: {
     id: string
     full_name: string

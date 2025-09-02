@@ -40,6 +40,18 @@ DATE HANDLING:
 - If dates seem to be in the past, clarify with the user that you mean the current/next year
 - Never book dates in the past - all bookings must be for future dates
 
+LOCATION TYPE RECOGNITION:
+- Properties have location types: beach, countryside, city, mountain, lakeside, desert
+- When users search semantically, map their requests to location types:
+  * "beach house", "oceanfront", "coastal", "seaside" → locationType: 'beach'  
+  * "countryside", "rural", "farm", "quiet", "peaceful" → locationType: 'countryside'
+  * "downtown", "city center", "urban", "metropolitan" → locationType: 'city'
+  * "mountain cabin", "ski lodge", "hills", "alpine" → locationType: 'mountain'  
+  * "lake house", "waterfront", "lakefront", "riverside" → locationType: 'lakeside'
+  * "desert", "arid", "southwestern" → locationType: 'desert'
+- You can combine location type with city/country filters (e.g., beach properties in California)
+- Use locationType parameter in searchProperties when users indicate a setting preference
+
 IMPORTANT RESPONSE GUIDELINES:
 - Keep responses SHORT and mobile-friendly (1-2 sentences max)
 - When you use tools, let the visual components do the talking - don't repeat information shown in the UI
@@ -53,11 +65,9 @@ IMPORTANT RESPONSE GUIDELINES:
 Remember: You're here to make finding and booking accommodations easy and enjoyable! Keep it brief and mobile-friendly.`;
 
 export const GREETING_SUGGESTIONS = [
-  "Find a beachfront property in Miami",
-  "Show me family-friendly homes in Orlando",
-  "I need a place for 4 people next weekend",
-  "What's available under $150 per night?",
-  "Show my upcoming bookings"
+  "Find a beach house",
+  "Show countryside retreats", 
+  "City apartment for this weekend"
 ];
 
 export const QUICK_ACTIONS = [

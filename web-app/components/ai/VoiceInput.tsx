@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useCallback, useEffect } from 'react';
+import { Mic, Loader2, MicOff } from 'lucide-react';
 
 interface VoiceInputProps {
   onTranscript: (transcript: string) => void;
@@ -211,13 +212,10 @@ export function VoiceInput({ onTranscript, disabled }: VoiceInputProps) {
       <button
         type="button"
         disabled
-        className="p-2 rounded-md text-red-400 cursor-not-allowed"
+        className="w-8 h-8 rounded-full flex items-center justify-center text-red-400 cursor-not-allowed"
         title={error || "Voice input not supported"}
       >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6" />
-        </svg>
+        <MicOff className="w-4 h-4" />
       </button>
     );
   }
@@ -231,12 +229,12 @@ export function VoiceInput({ onTranscript, disabled }: VoiceInputProps) {
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
       disabled={disabled || isTranscribing}
-      className={`p-2 rounded-md transition-all duration-200 select-none ${
+      className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 select-none touch-manipulation ${
         isRecording
-          ? 'bg-red-100 text-red-600 hover:bg-red-200 scale-110 shadow-lg'
+          ? 'bg-red-500 text-white scale-110 shadow-lg'
           : isTranscribing
-          ? 'bg-yellow-100 text-yellow-600'
-          : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
+          ? 'bg-yellow-500 text-white'
+          : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100 active:bg-gray-200'
       } ${(disabled || isTranscribing) ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
       title={
         isRecording 
@@ -247,20 +245,11 @@ export function VoiceInput({ onTranscript, disabled }: VoiceInputProps) {
       }
     >
       {isRecording ? (
-        <div className="w-5 h-5 relative">
-          <div className="w-5 h-5 bg-red-600 rounded-full animate-pulse"></div>
-          <div className="absolute inset-0 w-5 h-5 bg-red-400 rounded-full animate-ping"></div>
-        </div>
+        <div className="w-4 h-4 bg-white rounded-full animate-pulse"></div>
       ) : isTranscribing ? (
-        <div className="w-5 h-5 relative">
-          <svg className="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-          </svg>
-        </div>
+        <Loader2 className="w-4 h-4 animate-spin" />
       ) : (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-        </svg>
+        <Mic className="w-4 h-4" />
       )}
     </button>
   );

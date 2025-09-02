@@ -4,9 +4,51 @@ import { z } from 'zod';
 import { SYSTEM_PROMPT } from '@/lib/ai/prompts';
 import { createClient } from '@/lib/supabase/server';
 
+// Helper function to parse dates with current year as default
+function parseBookingDate(dateString: string): string {
+  const currentYear = new Date().getFullYear();
+  
+  // If dateString already includes a year (YYYY-MM-DD format), return as is
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+    return dateString;
+  }
+  
+  // Try to parse various date formats and default to current year
+  const date = new Date(dateString);
+  
+  // If the parsed year is way off (like 2001 for "oct 12"), use current year
+  if (date.getFullYear() < currentYear) {
+    date.setFullYear(currentYear);
+  }
+  
+  // If the date has passed in the current year, assume next year
+  const now = new Date();
+  if (date < now) {
+    date.setFullYear(currentYear + 1);
+  }
+  
+  return date.toISOString().split('T')[0];
+}
+
+// Tool for getting current date information
+const getCurrentDate = tool({
+  description: 'Get the current date and year information to ensure booking dates are in the future',
+  inputSchema: z.object({}),
+  execute: async () => {
+    const now = new Date();
+    return {
+      currentDate: now.toISOString().split('T')[0], // YYYY-MM-DD format
+      currentYear: now.getFullYear(),
+      currentMonth: now.getMonth() + 1,
+      currentDay: now.getDate(),
+      timestamp: now.toISOString()
+    };
+  },
+});
+
 // Tool for searching properties
 const searchProperties = tool({
-  description: 'Search for rental properties based on location, dates, guests, and other criteria',
+  description: 'Search for rental properties based on location, dates, guests, location type, and other criteria',
   inputSchema: z.object({
     location: z.string().optional().describe('City or country to search in'),
     checkIn: z.string().optional().describe('Check-in date in YYYY-MM-DD format'),
@@ -14,9 +56,14 @@ const searchProperties = tool({
     guests: z.number().optional().describe('Number of guests'),
     minPrice: z.number().optional().describe('Minimum price per night'),
     maxPrice: z.number().optional().describe('Maximum price per night'),
+    locationType: z.enum(['beach', 'countryside', 'city', 'mountain', 'lakeside', 'desert']).optional().describe('Type of location (beach, countryside, city, mountain, lakeside, desert)'),
   }),
-  execute: async ({ location, checkIn, checkOut, guests, minPrice, maxPrice }) => {
+  execute: async ({ location, checkIn, checkOut, guests, minPrice, maxPrice, locationType }) => {
     const supabase = createClient();
+    
+    // Parse and normalize dates if provided
+    const normalizedCheckIn = checkIn ? parseBookingDate(checkIn) : undefined;
+    const normalizedCheckOut = checkOut ? parseBookingDate(checkOut) : undefined;
     
     let query = supabase
       .from('properties')
@@ -32,6 +79,7 @@ const searchProperties = tool({
         city,
         country,
         address,
+        location_type,
         property_images (
           url
         ),
@@ -44,6 +92,10 @@ const searchProperties = tool({
     // Apply filters
     if (location) {
       query = query.or(`city.ilike.%${location}%,country.ilike.%${location}%`);
+    }
+    
+    if (locationType) {
+      query = query.eq('location_type', locationType);
     }
     
     if (guests) {
@@ -74,11 +126,12 @@ const searchProperties = tool({
       total: properties?.length || 0,
       searchCriteria: {
         location,
-        checkIn,
-        checkOut,
+        checkIn: normalizedCheckIn,
+        checkOut: normalizedCheckOut,
         guests,
         minPrice,
-        maxPrice
+        maxPrice,
+        locationType
       }
     };
   },
@@ -95,6 +148,10 @@ const checkAvailability = tool({
   execute: async ({ propertyId, checkIn, checkOut }) => {
     const supabase = createClient();
     
+    // Parse and normalize the dates to ensure they use the current/future year
+    const normalizedCheckIn = parseBookingDate(checkIn);
+    const normalizedCheckOut = parseBookingDate(checkOut);
+    
     // First check if property exists
     const { data: property, error: propertyError } = await supabase
       .from('properties')
@@ -107,8 +164,8 @@ const checkAvailability = tool({
         available: false,
         error: 'Property not found',
         propertyId,
-        checkIn,
-        checkOut
+        checkIn: normalizedCheckIn,
+        checkOut: normalizedCheckOut
       };
     }
     
@@ -118,7 +175,7 @@ const checkAvailability = tool({
       .select('id, check_in, check_out, status')
       .eq('property_id', propertyId)
       .eq('status', 'confirmed')
-      .or(`and(check_in.lte.${checkOut},check_out.gt.${checkIn})`);
+      .or(`and(check_in.lte.${normalizedCheckOut},check_out.gt.${normalizedCheckIn})`);
     
     if (bookingError) {
       console.error('Error checking bookings:', bookingError);
@@ -126,8 +183,8 @@ const checkAvailability = tool({
         available: false,
         error: 'Error checking availability',
         propertyId,
-        checkIn,
-        checkOut
+        checkIn: normalizedCheckIn,
+        checkOut: normalizedCheckOut
       };
     }
     
@@ -155,6 +212,10 @@ const createBooking = tool({
   }),
   execute: async ({ propertyId, checkIn, checkOut, guestCount }) => {
     const supabase = createClient();
+    
+    // Parse and normalize the dates to ensure they use the current/future year
+    const normalizedCheckIn = parseBookingDate(checkIn);
+    const normalizedCheckOut = parseBookingDate(checkOut);
     
     // Get user authentication
     const { data: { user } } = await supabase.auth.getUser();
@@ -195,7 +256,7 @@ const createBooking = tool({
       .select('id')
       .eq('property_id', propertyId)
       .eq('status', 'confirmed')
-      .or(`and(check_in.lte.${checkOut},check_out.gt.${checkIn})`);
+      .or(`and(check_in.lte.${normalizedCheckOut},check_out.gt.${normalizedCheckIn})`);
     
     if (conflictingBookings && conflictingBookings.length > 0) {
       return {
@@ -206,14 +267,14 @@ const createBooking = tool({
 
     // Validate and ensure dates are in the future
     const today = new Date();
-    const checkInDate = new Date(checkIn);
-    const checkOutDate = new Date(checkOut);
+    const checkInDate = new Date(normalizedCheckIn);
+    const checkOutDate = new Date(normalizedCheckOut);
     
     // If check-in date is in the past, it might be due to year parsing issue
     if (checkInDate < today) {
       return {
         success: false,
-        error: `Check-in date (${checkIn}) is in the past. Please provide dates in the current year (${today.getFullYear()}) or future.`
+        error: `Check-in date (${normalizedCheckIn}) is in the past. Please provide dates in the current year (${today.getFullYear()}) or future.`
       };
     }
     
@@ -234,8 +295,8 @@ const createBooking = tool({
       .insert({
         property_id: propertyId,
         guest_id: user.id,
-        check_in: checkIn,
-        check_out: checkOut,
+        check_in: normalizedCheckIn,
+        check_out: normalizedCheckOut,
         guest_count: guestCount,
         total_price: totalPrice,
         status: 'confirmed'
@@ -260,8 +321,8 @@ const createBooking = tool({
           city: property.city,
           country: property.country
         },
-        checkIn,
-        checkOut,
+        checkIn: normalizedCheckIn,
+        checkOut: normalizedCheckOut,
         guestCount,
         nights,
         pricePerNight: property.price_per_night,
@@ -528,6 +589,7 @@ When the user asks about their trips or bookings, you can see they have ${bookin
       messages: convertToModelMessages(messages),
       stopWhen: stepCountIs(5),
       tools: {
+        getCurrentDate,
         searchProperties,
         checkAvailability,
         createBooking,

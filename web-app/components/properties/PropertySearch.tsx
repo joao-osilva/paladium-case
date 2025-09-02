@@ -8,6 +8,7 @@ interface SearchParams {
   checkin?: string
   checkout?: string
   guests?: string
+  location_type?: string
 }
 
 interface PropertySearchProps {
@@ -17,13 +18,25 @@ interface PropertySearchProps {
 export function PropertySearch({ searchParams }: PropertySearchProps) {
   const router = useRouter()
   const [isMobile, setIsMobile] = useState(false)
+  const [showFilters, setShowFilters] = useState(false)
   
   const [filters, setFilters] = useState({
     location: searchParams.location || '',
     checkin: searchParams.checkin || '',
     checkout: searchParams.checkout || '',
-    guests: searchParams.guests || '1'
+    guests: searchParams.guests || '1',
+    location_type: searchParams.location_type || ''
   })
+
+  const locationTypes = [
+    { value: '', label: 'Any location type' },
+    { value: 'beach', label: '🏖️ Beach/Coastal' },
+    { value: 'countryside', label: '🌾 Countryside/Rural' },
+    { value: 'city', label: '🏙️ City/Urban' },
+    { value: 'mountain', label: '🏔️ Mountain/Hills' },
+    { value: 'lakeside', label: '🏞️ Lakeside/Waterfront' },
+    { value: 'desert', label: '🏜️ Desert/Arid' }
+  ]
 
   useEffect(() => {
     const checkMobile = () => {
@@ -132,6 +145,44 @@ export function PropertySearch({ searchParams }: PropertySearchProps) {
             </div>
           </div>
         </div>
+
+        {/* Additional Filters Toggle */}
+        <div className="mt-4 flex justify-center">
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
+          >
+            <svg className={`w-4 h-4 transition-transform ${showFilters ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+            </svg>
+            {showFilters ? 'Hide filters' : 'More filters'}
+          </button>
+        </div>
+
+        {/* Additional Filters */}
+        {showFilters && (
+          <div className="mt-4 bg-gray-50 border border-gray-200 rounded-lg p-4">
+            <div className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'grid-cols-1 gap-4'}`}>
+              {/* Location Type Filter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Location Type
+                </label>
+                <select
+                  value={filters.location_type}
+                  onChange={(e) => setFilters(prev => ({ ...prev, location_type: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-900 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  {locationTypes.map(type => (
+                    <option key={type.value} value={type.value}>
+                      {type.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

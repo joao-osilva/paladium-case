@@ -16,6 +16,7 @@ interface SearchResultsProps {
       city: string;
       country: string;
       address: string;
+      location_type?: string;
       property_images?: Array<{ url: string }>;
       profiles?: { full_name: string; avatar_url?: string };
     }>;
@@ -27,6 +28,7 @@ interface SearchResultsProps {
       guests?: number;
       minPrice?: number;
       maxPrice?: number;
+      locationType?: string;
     };
     error?: string;
   };
@@ -38,6 +40,21 @@ export function SearchResults({ results, onCheckAvailability }: SearchResultsPro
 
   const formatSearchSummary = () => {
     const parts = [];
+    
+    if (searchCriteria?.locationType) {
+      const locationTypeMap = {
+        beach: '🏖️ beach',
+        countryside: '🌾 countryside',
+        city: '🏙️ city', 
+        mountain: '🏔️ mountain',
+        lakeside: '🏞️ lakeside',
+        desert: '🏜️ desert'
+      };
+      const locationTypeLabel = locationTypeMap[searchCriteria.locationType as keyof typeof locationTypeMap];
+      if (locationTypeLabel) {
+        parts.push(locationTypeLabel + ' properties');
+      }
+    }
     
     if (searchCriteria?.location) {
       parts.push(`in ${searchCriteria.location}`);
@@ -62,7 +79,6 @@ export function SearchResults({ results, onCheckAvailability }: SearchResultsPro
         parts.push(`up to $${searchCriteria.maxPrice}/night`);
       }
     }
-    
     
     return parts.length > 0 ? parts.join(' ') : '';
   };
