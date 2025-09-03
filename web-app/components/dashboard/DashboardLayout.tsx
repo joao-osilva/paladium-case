@@ -182,7 +182,7 @@ export function DashboardLayout({ children, user }: DashboardLayoutProps) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col sm:flex-row justify-between items-center">
             <p className="text-sm text-[#717171]">
-              © 2024 PaxBnb, Inc. All rights reserved.
+              © 2025 PaxBnb, Inc. All rights reserved.
             </p>
             <div className="flex space-x-6 mt-4 sm:mt-0">
               <a href="/help" className="text-sm text-[#717171] hover:text-[#222222]">

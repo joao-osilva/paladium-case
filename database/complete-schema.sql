@@ -235,7 +235,7 @@ BEGIN
         NEW.id,
         COALESCE(NEW.email, ''),
         user_full_name,
-        user_type_value::user_type_enum
+        user_type_value::public.user_type_enum
     )
     ON CONFLICT (id) DO UPDATE SET
         email = EXCLUDED.email,
